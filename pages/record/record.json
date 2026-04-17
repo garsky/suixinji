@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "记账",
+  "usingComponents": {
+    "category-picker": "/components/category-picker/category-picker"
+  }
+}

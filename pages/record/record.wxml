@@ -1,0 +1,237 @@
+<view class="container">
+  <view class="mode-tabs">
+    <view class="mode-tab {{mode === 'parse' ? 'active' : ''}}" bindtap="onSwitchMode" data-mode="parse">
+      <text>拍照记账</text>
+    </view>
+    <view class="mode-tab {{mode === 'manual' ? 'active' : ''}}" bindtap="onSwitchMode" data-mode="manual">
+      <text>手动记账</text>
+    </view>
+  </view>
+
+  <block wx:if="{{mode === 'parse'}}">
+    <view class="card" wx:if="{{bills.length === 0}}">
+      <view class="upload-area" bindtap="onChooseImage">
+        <view class="upload-icon">📷</view>
+        <text class="upload-text">拍照 / 上传账单截图</text>
+        <text class="upload-hint">支持花呗、信用卡、微信、银行账单截图</text>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{bills.length > 0}}">
+      <view class="parse-header">
+        <text class="parse-title">解析结果</text>
+        <view class="parse-stats">
+          <text class="stat-confirmed">✅{{confirmedCount}}</text>
+          <text class="stat-pending">⚠️{{pendingCount}}</text>
+          <text class="stat-unknown">❌{{unknownCount}}</text>
+        </view>
+      </view>
+
+      <view class="bill-parse-list">
+        <view class="bill-parse-item" wx:for="{{bills}}" wx:key="_id">
+          <view class="bill-parse-left">
+            <view class="bill-parse-status">
+              <text wx:if="{{item.status === 'confirmed'}}">✅</text>
+              <text wx:elif="{{item.confidence === 'low'}}">❌</text>
+              <text wx:else>⚠️</text>
+            </view>
+            <view class="bill-parse-info">
+              <text class="bill-parse-merchant">{{item.merchant}}</text>
+              <text class="bill-parse-meta">{{item.date}} · {{item.category}}</text>
+            </view>
+          </view>
+          <view class="bill-parse-right">
+            <text class="bill-parse-amount amount-expense">¥{{item.amount}}</text>
+            <view class="bill-parse-actions">
+              <text class="action-btn" bindtap="onBillConfirm" data-index="{{index}}">✓</text>
+              <text class="action-btn" bindtap="onBillEdit" data-index="{{index}}">✎</text>
+              <text class="action-btn action-delete" bindtap="onBillDelete" data-index="{{index}}">✕</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="parse-bottom">
+        <view class="btn-secondary" bindtap="onShowStrategy">
+          <text>🔄 策略调整</text>
+        </view>
+        <view class="btn-primary" bindtap="onSaveBills">
+          <text>确认入账</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:if="{{mode === 'manual'}}">
+    <view class="card">
+      <view class="form-group">
+        <text class="form-label">金额</text>
+        <input class="form-input" type="digit" placeholder="0.00" value="{{manualBill.amount}}" bindinput="onManualInput" data-field="amount" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">商户</text>
+        <input class="form-input" placeholder="商户名称" value="{{manualBill.merchant}}" bindinput="onManualInput" data-field="merchant" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">分类</text>
+        <view class="form-picker" bindtap="onShowCategoryPicker">
+          <text class="{{manualBill.category ? '' : 'placeholder'}}">{{manualBill.category || '请选择分类'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">支付渠道</text>
+        <view class="form-picker" bindtap="onShowChannelPicker">
+          <text class="{{manualBill.channel ? '' : 'placeholder'}}">{{manualBill.channel || '请选择渠道'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">级别</text>
+        <view class="level-tabs">
+          <view class="level-tab {{manualBill.level === 'daily' ? 'active' : ''}}" bindtap="onManualInput" data-field="level" data-value="daily">日常</view>
+          <view class="level-tab {{manualBill.level === 'extra' ? 'active' : ''}}" bindtap="onManualInput" data-field="level" data-value="extra">额外</view>
+        </view>
+      </view>
+
+      <view class="btn-primary mt-20" bindtap="onManualSave">
+        <text>保存</text>
+      </view>
+    </view>
+  </block>
+
+  <view class="popup-mask" wx:if="{{showSingleEdit}}" bindtap="onSingleEditCancel"></view>
+  <view class="popup {{showSingleEdit ? 'show' : ''}}" wx:if="{{showSingleEdit}}">
+    <view class="popup-header">
+      <text class="popup-title">编辑账单</text>
+      <text class="popup-close" bindtap="onSingleEditCancel">✕</text>
+    </view>
+    <view class="popup-body">
+      <view class="form-group">
+        <text class="form-label">商户</text>
+        <input class="form-input" value="{{editingBill.merchant}}" bindinput="onSingleEditField" data-field="merchant" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">金额</text>
+        <input class="form-input" type="digit" value="{{editingBill.amount}}" bindinput="onSingleEditField" data-field="amount" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">分类</text>
+        <view class="form-picker" bindtap="onShowCategoryPicker">
+          <text>{{editingBill.category || '请选择'}}</text>
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">支付渠道</text>
+        <view class="form-picker" bindtap="onShowChannelPicker">
+          <text>{{editingBill.channel || '请选择'}}</text>
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">级别</text>
+        <view class="level-tabs">
+          <view class="level-tab {{editingBill.level === 'daily' ? 'active' : ''}}" bindtap="onSingleEditField" data-field="level" data-value="daily">日常</view>
+          <view class="level-tab {{editingBill.level === 'extra' ? 'active' : ''}}" bindtap="onSingleEditField" data-field="level" data-value="extra">额外</view>
+        </view>
+      </view>
+      <view class="form-group">
+        <text class="form-label">标签（逗号分隔）</text>
+        <input class="form-input" value="{{editingBill.tags.join(',')}}" bindinput="onSingleEditTag" />
+      </view>
+    </view>
+    <view class="popup-footer">
+      <view class="btn-secondary" bindtap="onSingleEditCancel">取消</view>
+      <view class="btn-primary" bindtap="onSingleEditSave">保存</view>
+    </view>
+  </view>
+
+  <view class="popup-mask" wx:if="{{showStrategyPanel}}" bindtap="onHideStrategy"></view>
+  <view class="popup popup-strategy {{showStrategyPanel ? 'show' : ''}}" wx:if="{{showStrategyPanel}}">
+    <view class="popup-header">
+      <text class="popup-title">策略调整</text>
+      <text class="popup-close" bindtap="onHideStrategy">✕</text>
+    </view>
+    <scroll-view class="popup-body" scroll-y>
+      <view class="template-list">
+        <text class="form-label">选择模板</text>
+        <view class="template-items">
+          <view class="template-item {{strategy.name === item.name ? 'active' : ''}}"
+                wx:for="{{strategyTemplates}}" wx:key="name"
+                bindtap="onSelectTemplate" data-index="{{index}}">
+            {{item.name}}
+          </view>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">策略名</text>
+        <input class="form-input" value="{{strategy.name}}" bindinput="onStrategyFieldChange" data-field="name" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">日期范围</text>
+        <view class="date-range">
+          <picker mode="date" value="{{strategy.conditions.date_from}}" bindchange="onStrategyFieldChange" data-field="conditions.date_from">
+            <text class="date-input">{{strategy.conditions.date_from || '开始日期'}}</text>
+          </picker>
+          <text>~</text>
+          <picker mode="date" value="{{strategy.conditions.date_to}}" bindchange="onStrategyFieldChange" data-field="conditions.date_to">
+            <text class="date-input">{{strategy.conditions.date_to || '结束日期'}}</text>
+          </picker>
+        </view>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">商户关键词</text>
+        <input class="form-input" value="{{strategy.conditions.merchant_keyword}}" bindinput="onStrategyFieldChange" data-field="conditions.merchant_keyword" placeholder="可选" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">金额范围</text>
+        <view class="amount-range">
+          <input class="form-input range-input" type="digit" value="{{strategy.conditions.amount_min}}" bindinput="onStrategyFieldChange" data-field="conditions.amount_min" placeholder="最小" />
+          <text>~</text>
+          <input class="form-input range-input" type="digit" value="{{strategy.conditions.amount_max}}" bindinput="onStrategyFieldChange" data-field="conditions.amount_max" placeholder="最大" />
+        </view>
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">添加标签（逗号分隔）</text>
+        <input class="form-input" value="{{strategy.actions.add_tags.join(',')}}" bindinput="onStrategyFieldChange" data-field="actions.add_tags" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">归入项目</text>
+        <input class="form-input" value="{{strategy.actions.set_project}}" bindinput="onStrategyFieldChange" data-field="actions.set_project" placeholder="项目名称" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">标记级别</text>
+        <view class="level-tabs">
+          <view class="level-tab {{strategy.actions.set_level === 'daily' ? 'active' : ''}}" bindtap="onStrategyFieldChange" data-field="actions.set_level" data-value="daily">日常</view>
+          <view class="level-tab {{strategy.actions.set_level === 'extra' ? 'active' : ''}}" bindtap="onStrategyFieldChange" data-field="actions.set_level" data-value="extra">额外</view>
+        </view>
+      </view>
+
+      <view class="preview-section" wx:if="{{previewBills.length > 0}}">
+        <text class="form-label">匹配预览：{{previewCount}}条，合计¥{{previewAmount}}</text>
+        <view class="preview-list">
+          <view class="preview-item" wx:for="{{previewBills}}" wx:key="_id">
+            <text>{{item.date}} {{item.merchant}}</text>
+            <text class="amount-expense">¥{{item.amount}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="popup-footer">
+      <view class="btn-secondary" bindtap="onStrategyPreview">预览匹配</view>
+      <view class="btn-primary" bindtap="onStrategyExecute" wx:if="{{previewBills.length > 0}}">确认执行</view>
+    </view>
+  </view>
+
+  <category-picker wx:if="{{showCategoryPicker}}" categories="{{categories}}" bind:pick="onCategoryPick" bind:close="onHideCategoryPicker" />
+</view>

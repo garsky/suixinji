@@ -1,0 +1,96 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">AI 模型配置</view>
+
+    <view class="form-group">
+      <text class="form-label">模型提供商</text>
+      <picker range="{{providerOptions}}" range-key="label" value="{{currentProviderIndex}}" bindchange="onProviderChange">
+        <view class="form-picker">
+          <text>{{providerOptions[currentProviderIndex].label}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-group" wx:if="{{availableModels.length > 0}}">
+      <text class="form-label">模型</text>
+      <picker range="{{availableModels}}" value="{{currentModelIndex}}" bindchange="onModelChange">
+        <view class="form-picker">
+          <text>{{availableModels[currentModelIndex]}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">API Key</text>
+      <input class="form-input" placeholder="sk-..." value="{{aiConfig.api_key}}" bindinput="onApiKeyInput" password="{{!showPassword}}" />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">API 地址（可选，默认使用官方地址）</text>
+      <input class="form-input" placeholder="https://api.openai.com" value="{{aiConfig.base_url}}" bindinput="onBaseUrlInput" />
+    </view>
+
+    <view class="test-row">
+      <view class="btn-secondary" bindtap="onTestConnection">
+        <text>{{testing ? '测试中...' : '测试连接'}}</text>
+      </view>
+      <text class="test-result">{{testResult}}</text>
+    </view>
+
+    <view class="btn-primary mt-20" bindtap="onSaveAIConfig">
+      <text>保存配置</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">日常基线预算</view>
+    <view class="form-group">
+      <text class="form-label">每月日常支出基线</text>
+      <input class="form-input" type="digit" placeholder="如 3000" value="{{dailyBudget}}" bindinput="onDailyBudgetInput" />
+    </view>
+    <view class="btn-primary" bindtap="onSaveBudget">
+      <text>保存</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">密码保护</view>
+    <view class="form-group">
+      <text class="form-label">访问密码</text>
+      <view class="password-row">
+        <input class="form-input flex-1" placeholder="设置密码" value="{{password}}" bindinput="onPasswordInput" password="{{!showPassword}}" />
+        <view class="toggle-pwd" bindtap="onTogglePassword">
+          <text>{{showPassword ? '隐藏' : '显示'}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="btn-primary" bindtap="onSavePassword">
+      <text>保存</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">支出分类管理</view>
+    <view class="category-list">
+      <view class="category-item" wx:for="{{categories}}" wx:key="*this">
+        <text class="category-name">{{item}}</text>
+        <text class="category-delete" bindtap="onDeleteCategory" data-index="{{index}}">✕</text>
+      </view>
+    </view>
+    <view class="btn-secondary mt-20" bindtap="onAddCategory">
+      <text>+ 添加分类</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">策略模板</view>
+    <view class="template-list">
+      <view class="template-card" wx:for="{{strategyTemplates}}" wx:key="name">
+        <text class="template-name">{{item.name}}</text>
+        <text class="template-desc">标签: {{item.actions.add_tags.join(', ')}}</text>
+      </view>
+    </view>
+  </view>
+</view>

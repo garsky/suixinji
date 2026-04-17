@@ -1,0 +1,86 @@
+<view class="container">
+  <view class="card" wx:if="{{bill}}">
+    <view class="bill-header" wx:if="{{bill.project}}">
+      <view class="project-badge">
+        <text class="project-badge-text">{{bill.project}}</text>
+      </view>
+      <view class="remove-from-project" bindtap="onRemoveFromProject">
+        <text class="remove-text">移出项目</text>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">金额</text>
+      <input class="form-input" type="digit" placeholder="0.00" value="{{bill.amount}}" bindinput="onFieldInput" data-field="amount" />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">商户</text>
+      <input class="form-input" placeholder="商户名称" value="{{bill.merchant}}" bindinput="onFieldInput" data-field="merchant" />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">分类</text>
+      <view class="form-picker" bindtap="onShowCategoryPicker">
+        <text class="{{bill.category ? '' : 'placeholder'}}">{{bill.category || '请选择分类'}}</text>
+        <text class="picker-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">支付渠道</text>
+      <view class="form-picker" bindtap="onShowChannelPicker">
+        <text class="{{bill.channel ? '' : 'placeholder'}}">{{bill.channel || '请选择渠道'}}</text>
+        <text class="picker-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">级别</text>
+      <view class="level-tabs">
+        <view class="level-tab {{bill.level === 'daily' ? 'active' : ''}}" bindtap="onLevelChange" data-value="daily">日常</view>
+        <view class="level-tab {{bill.level === 'extra' ? 'active' : ''}}" bindtap="onLevelChange" data-value="extra">额外</view>
+      </view>
+    </view>
+
+    <view class="form-group" wx:if="{{bill.level === 'extra'}}">
+      <text class="form-label">归属项目</text>
+      <input class="form-input" placeholder="项目名称" value="{{bill.project || ''}}" bindinput="onProjectInput" data-field="project" />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">标签（逗号分隔）</text>
+      <input class="form-input" placeholder="如：旅游,餐饮" value="{{bill.tags.join(',')}}" bindinput="onTagInput" />
+    </view>
+
+    <view class="form-group" wx:if="{{bill.dateStr}}">
+      <text class="form-label">日期</text>
+      <text class="form-date">{{bill.dateStr}}</text>
+    </view>
+
+    <view class="btn-primary mt-20" bindtap="onSave">
+      <text>保存</text>
+    </view>
+
+    <view class="btn-danger mt-20" bindtap="onDelete" wx:if="{{!isNew}}">
+      <text>删除此账单</text>
+    </view>
+  </view>
+
+  <category-picker wx:if="{{showCategoryPicker}}" categories="{{categories}}" bind:pick="onCategoryPick" bind:close="onHideCategoryPicker" />
+
+  <view class="popup-mask" wx:if="{{showChannelPicker}}" bindtap="onHideChannelPicker"></view>
+  <view class="popup {{showChannelPicker ? 'show' : ''}}" wx:if="{{showChannelPicker}}">
+    <view class="popup-header">
+      <text class="popup-title">选择支付渠道</text>
+      <text class="popup-close" bindtap="onHideChannelPicker">✕</text>
+    </view>
+    <view class="picker-grid">
+      <view class="picker-item {{bill.channel === item ? 'active' : ''}}"
+            wx:for="{{channels}}" wx:key="*this"
+            bindtap="onChannelPick" data-channel="{{item}}">
+        <text>{{item}}</text>
+      </view>
+    </view>
+  </view>
+</view>

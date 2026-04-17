@@ -1,0 +1,174 @@
+<view class="container">
+  <view class="card" wx:if="{{activeProjects.length > 0}}">
+    <view class="section-title">活跃项目</view>
+    <view class="project-list">
+      <view class="project-card" wx:for="{{activeProjects}}" wx:key="_id" bindtap="onProjectTap" data-id="{{item._id}}">
+        <view class="project-header">
+          <text class="project-name">{{item.name}}</text>
+          <view class="project-tags">
+            <text class="project-type-tag {{item.type === 'time' ? 'type-time' : 'type-keyword'}}">{{item.type === 'time' ? '时间段' : '关键词'}}</text>
+            <text class="project-status active">进行中</text>
+          </view>
+        </view>
+        <view class="project-meta">
+          <text class="meta-item" wx:if="{{item.type === 'time'}}">{{item.start}} ~ {{item.end || '至今'}}</text>
+          <text class="meta-item" wx:if="{{item.type === 'keyword'}}">匹配: {{item.keyword}}</text>
+        </view>
+        <view class="project-budget" wx:if="{{item.budget > 0}}">
+          <text class="budget-label">预算</text>
+          <text class="budget-value">¥{{item.budget}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{closedProjects.length > 0}}">
+    <view class="section-title">已关闭</view>
+    <view class="project-list">
+      <view class="project-card closed" wx:for="{{closedProjects}}" wx:key="_id" bindtap="onProjectTap" data-id="{{item._id}}">
+        <view class="project-header">
+          <text class="project-name">{{item.name}}</text>
+          <view class="project-tags">
+            <text class="project-type-tag {{item.type === 'time' ? 'type-time' : 'type-keyword'}}">{{item.type === 'time' ? '时间段' : '关键词'}}</text>
+            <text class="project-status closed">已关闭</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{activeProjects.length === 0 && closedProjects.length === 0}}">
+    <text class="empty-text">暂无项目</text>
+    <text class="empty-hint">点击下方按钮创建额外支出项目</text>
+  </view>
+
+  <view class="fab" bindtap="onShowCreate">
+    <text class="fab-icon">+</text>
+  </view>
+
+  <view class="popup-mask" wx:if="{{showCreate}}" bindtap="onHideCreate"></view>
+  <view class="popup {{showCreate ? 'show' : ''}}" wx:if="{{showCreate}}">
+    <view class="popup-header">
+      <text class="popup-title">新建项目</text>
+      <text class="popup-close" bindtap="onHideCreate">✕</text>
+    </view>
+    <view class="popup-body">
+      <view class="form-group">
+        <text class="form-label">项目名称</text>
+        <input class="form-input" placeholder="如：福建旅游" value="{{newProject.name}}" bindinput="onCreateFieldChange" data-field="name" />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">项目类型</text>
+        <view class="type-tabs">
+          <view class="type-tab {{newProject.type === 'time' ? 'active' : ''}}" bindtap="onTypeChange" data-type="time">
+            <text class="type-icon">📅</text>
+            <text>时间段</text>
+          </view>
+          <view class="type-tab {{newProject.type === 'keyword' ? 'active' : ''}}" bindtap="onTypeChange" data-type="keyword">
+            <text class="type-icon">🏷️</text>
+            <text>关键词</text>
+          </view>
+        </view>
+        <view class="type-desc" wx:if="{{newProject.type === 'time'}}">
+          <text class="type-desc-text">按时间段匹配，适合旅游、出差等有明确起止日期的项目</text>
+        </view>
+        <view class="type-desc" wx:if="{{newProject.type === 'keyword'}}">
+          <text class="type-desc-text">按商户关键词匹配，适合3D打印机、装修等按类型归集的项目</text>
+        </view>
+      </view>
+
+      <block wx:if="{{newProject.type === 'time'}}">
+        <view class="form-group">
+          <text class="form-label">开始日期</text>
+          <picker mode="date" value="{{newProject.start}}" bindchange="onCreateFieldChange" data-field="start">
+            <view class="form-picker">
+              <text>{{newProject.start || '选择日期'}}</text>
+            </view>
+          </picker>
+        </view>
+        <view class="form-group">
+          <text class="form-label">结束日期（可选）</text>
+          <picker mode="date" value="{{newProject.end}}" bindchange="onCreateFieldChange" data-field="end">
+            <view class="form-picker">
+              <text>{{newProject.end || '选择日期'}}</text>
+            </view>
+          </picker>
+        </view>
+      </block>
+
+      <block wx:if="{{newProject.type === 'keyword'}}">
+        <view class="form-group">
+          <text class="form-label">匹配关键词</text>
+          <input class="form-input" placeholder="如：3D打印" value="{{newProject.keyword}}" bindinput="onCreateFieldChange" data-field="keyword" />
+          <text class="form-hint">包含此关键词的商户消费将自动归入此项目</text>
+        </view>
+      </block>
+
+      <view class="form-group">
+        <text class="form-label">预算（可选）</text>
+        <input class="form-input" type="digit" placeholder="0.00" value="{{newProject.budget}}" bindinput="onCreateFieldChange" data-field="budget" />
+      </view>
+    </view>
+    <view class="popup-footer">
+      <view class="btn-secondary" bindtap="onHideCreate">取消</view>
+      <view class="btn-primary" bindtap="onCreateProject">创建</view>
+    </view>
+  </view>
+
+  <view class="popup-mask" wx:if="{{showDetail}}" bindtap="onHideDetail"></view>
+  <view class="popup popup-detail {{showDetail ? 'show' : ''}}" wx:if="{{showDetail}}">
+    <view class="popup-header">
+      <text class="popup-title">{{currentProject.name}}</text>
+      <text class="popup-close" bindtap="onHideDetail">✕</text>
+    </view>
+    <scroll-view class="popup-body" scroll-y>
+      <view class="detail-summary">
+        <view class="detail-row">
+          <text class="detail-label">类型</text>
+          <text class="detail-type-tag {{currentProject.type === 'time' ? 'type-time' : 'type-keyword'}}">{{currentProject.type === 'time' ? '时间段' : '关键词'}}</text>
+        </view>
+        <view class="detail-row" wx:if="{{currentProject.type === 'time'}}">
+          <text class="detail-label">时间范围</text>
+          <text>{{currentProject.start}} ~ {{currentProject.end || '至今'}}</text>
+        </view>
+        <view class="detail-row" wx:if="{{currentProject.type === 'keyword'}}">
+          <text class="detail-label">匹配关键词</text>
+          <text>{{currentProject.keyword}}</text>
+        </view>
+        <view class="detail-row">
+          <text class="detail-label">累计支出</text>
+          <text class="amount amount-expense">¥{{totalAmount}}</text>
+        </view>
+        <view class="detail-row" wx:if="{{currentProject.budget > 0}}">
+          <text class="detail-label">预算</text>
+          <text>¥{{currentProject.budget}}</text>
+        </view>
+        <view class="detail-row" wx:if="{{currentProject.budget > 0}}">
+          <text class="detail-label">剩余</text>
+          <text class="{{currentProject.budget - totalAmount < 0 ? 'amount-expense' : 'amount-income'}}">
+            ¥{{currentProject.budget - totalAmount}}
+          </text>
+        </view>
+      </view>
+
+      <view class="detail-bills">
+        <text class="section-title">关联账单</text>
+        <view class="bill-item" wx:for="{{projectBills}}" wx:key="_id" bindtap="onBillTap" data-id="{{item._id}}">
+          <view class="bill-info">
+            <text class="bill-merchant">{{item.merchant}}</text>
+            <text class="bill-meta">{{item.date}} · {{item.category}}</text>
+          </view>
+          <text class="bill-amount amount-expense">¥{{item.amount}}</text>
+        </view>
+        <view class="empty-bills" wx:if="{{projectBills.length === 0}}">
+          <text>暂无关联账单</text>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="popup-footer">
+      <view class="btn-danger" bindtap="onDeleteProject">删除</view>
+      <view class="btn-secondary" bindtap="onCloseProject">关闭项目</view>
+    </view>
+  </view>
+</view>

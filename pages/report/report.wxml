@@ -1,0 +1,89 @@
+<view class="container">
+  <view class="month-header">
+    <view class="month-nav">
+      <view class="nav-btn" bindtap="onPrevMonth"><text class="arrow">‹</text></view>
+      <text class="month-text">{{currentMonth}}</text>
+      <view class="nav-btn" bindtap="onNextMonth"><text class="arrow">›</text></view>
+    </view>
+  </view>
+
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 'overview' ? 'active' : ''}}" bindtap="onTabChange" data-index="0">总览</view>
+    <view class="tab-item {{activeTab === 'top' ? 'active' : ''}}" bindtap="onTabChange" data-index="1">TOP支出</view>
+    <view class="tab-item {{activeTab === 'trend' ? 'active' : ''}}" bindtap="onTabChange" data-index="2">趋势</view>
+    <view class="tab-item {{activeTab === 'compare' ? 'active' : ''}}" bindtap="onTabChange" data-index="3">对比</view>
+  </view>
+
+  <block wx:if="{{activeTab === 'overview'}}">
+    <view class="card">
+      <view class="section-title">支出总览</view>
+      <view class="overview-amounts">
+        <view class="overview-item">
+          <text class="overview-label">总支出</text>
+          <text class="amount amount-expense">¥{{totalExpense}}</text>
+        </view>
+        <view class="overview-row">
+          <view class="overview-sub">
+            <text class="overview-label">日常</text>
+            <text class="overview-value">¥{{dailyExpense}}</text>
+          </view>
+          <view class="overview-sub">
+            <text class="overview-label">额外</text>
+            <text class="overview-value">¥{{extraExpense}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">分类占比</view>
+      <view class="bar-chart">
+        <view class="bar-item" wx:for="{{categoryData}}" wx:key="name">
+          <view class="bar-label-row">
+            <text class="bar-name">{{item.name}}</text>
+            <text class="bar-value">¥{{item.value}} ({{item.percent}}%)</text>
+          </view>
+          <view class="bar-track">
+            <view class="bar-fill" style="width: {{item.percent}}%"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:if="{{activeTab === 'top'}}">
+    <view class="card">
+      <view class="section-title">TOP10 支出商户</view>
+      <view class="top-list">
+        <view class="top-item" wx:for="{{topExpenses}}" wx:key="merchant">
+          <view class="top-rank">{{index + 1}}</view>
+          <view class="top-info">
+            <text class="top-merchant">{{item.merchant}}</text>
+            <text class="top-count">{{item.count}}笔</text>
+          </view>
+          <text class="top-amount amount-expense">¥{{item.amount}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:if="{{activeTab === 'trend'}}">
+    <view class="card">
+      <view class="section-title">日常支出趋势</view>
+      <view class="chart-placeholder">
+        <text class="placeholder-text">趋势图需要多月数据积累</text>
+        <text class="placeholder-hint">持续记账后即可查看</text>
+      </view>
+    </view>
+  </block>
+
+  <block wx:if="{{activeTab === 'compare'}}">
+    <view class="card">
+      <view class="section-title">月度对比</view>
+      <view class="chart-placeholder">
+        <text class="placeholder-text">月度对比需要多月数据积累</text>
+        <text class="placeholder-hint">持续记账后即可查看</text>
+      </view>
+    </view>
+  </block>
+</view>

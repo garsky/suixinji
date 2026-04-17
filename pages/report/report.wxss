@@ -1,0 +1,207 @@
+.month-header {
+  padding: 20rpx 0;
+}
+
+.month-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arrow {
+  font-size: 32rpx;
+  color: #4A90D9;
+}
+
+.month-text {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin: 0 30rpx;
+}
+
+.tab-bar {
+  display: flex;
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 6rpx;
+  margin-bottom: 20rpx;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.tab-item.active {
+  background: #4A90D9;
+  color: #fff;
+  font-weight: 500;
+}
+
+.overview-amounts {
+  margin-top: 10rpx;
+}
+
+.overview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.overview-label {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.overview-value {
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.overview-row {
+  display: flex;
+  justify-content: space-around;
+  padding: 20rpx 0;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.overview-sub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bar-chart {
+  margin-top: 10rpx;
+}
+
+.bar-item {
+  margin-bottom: 20rpx;
+}
+
+.bar-label-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.bar-name {
+  font-size: 26rpx;
+  color: #333;
+}
+
+.bar-value {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.bar-track {
+  height: 16rpx;
+  background: #f0f0f0;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: #4A90D9;
+  border-radius: 8rpx;
+  min-width: 4rpx;
+}
+
+.top-list {
+  margin-top: 10rpx;
+}
+
+.top-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.top-item:last-child {
+  border-bottom: none;
+}
+
+.top-rank {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24rpx;
+  color: #666;
+  margin-right: 16rpx;
+}
+
+.top-item:nth-child(1) .top-rank {
+  background: #ffd700;
+  color: #fff;
+}
+
+.top-item:nth-child(2) .top-rank {
+  background: #c0c0c0;
+  color: #fff;
+}
+
+.top-item:nth-child(3) .top-rank {
+  background: #cd7f32;
+  color: #fff;
+}
+
+.top-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-merchant {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.top-count {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
+
+.top-amount {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.chart-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 0;
+}
+
+.placeholder-text {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 10rpx;
+}
+
+.placeholder-hint {
+  font-size: 24rpx;
+  color: #ccc;
+}

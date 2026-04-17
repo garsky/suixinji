@@ -1,0 +1,14 @@
+<view class="picker-mask" bindtap="onMaskTap"></view>
+<view class="picker-panel">
+  <view class="picker-header">
+    <text class="picker-title">选择分类</text>
+    <text class="picker-close" bindtap="onClose">✕</text>
+  </view>
+  <view class="picker-grid">
+    <view class="picker-item {{selectedCategory === item ? 'active' : ''}}"
+          wx:for="{{categories}}" wx:key="*this"
+          bindtap="onSelectCategory" data-category="{{item}}">
+      <text>{{item}}</text>
+    </view>
+  </view>
+</view>

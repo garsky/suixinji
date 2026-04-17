@@ -1,0 +1,73 @@
+<view class="container">
+  <view class="month-header">
+    <view class="month-nav">
+      <view class="nav-btn" bindtap="onPrevMonth">
+        <text class="arrow">‹</text>
+      </view>
+      <text class="month-text">{{currentMonth}}</text>
+      <view class="nav-btn" bindtap="onNextMonth">
+        <text class="arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card overview-card">
+    <view class="total-row">
+      <text class="total-label">总支出</text>
+      <text class="amount amount-expense">¥{{totalExpense}}</text>
+    </view>
+    <view class="split-row">
+      <view class="split-item">
+        <text class="split-label">日常</text>
+        <text class="split-amount">¥{{dailyExpense}}</text>
+        <text class="split-status {{dailyBudgetStatus === '超基线' ? 'status-unknown' : 'status-confirmed'}}">{{dailyBudgetStatus || '未设基线'}}</text>
+      </view>
+      <view class="split-divider"></view>
+      <view class="split-item">
+        <text class="split-label">额外</text>
+        <text class="split-amount">¥{{extraExpense}}</text>
+        <text class="split-status status-pending">{{extraProjects.length}}个项目</text>
+      </view>
+    </view>
+    <view class="pie-placeholder" wx:if="{{totalExpense > 0}}">
+      <view class="pie-chart">
+        <view class="pie-daily" style="width: {{dailyExpense / totalExpense * 100}}%"></view>
+        <view class="pie-extra" style="width: {{extraExpense / totalExpense * 100}}%"></view>
+      </view>
+      <view class="pie-legend">
+        <view class="legend-item">
+          <view class="legend-dot daily"></view>
+          <text>日常 {{dailyExpense / totalExpense * 100}}%</text>
+        </view>
+        <view class="legend-item">
+          <view class="legend-dot extra"></view>
+          <text>额外 {{extraExpense / totalExpense * 100}}%</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{extraProjects.length > 0}}">
+    <view class="section-title">额外项目</view>
+    <view class="project-list">
+      <view class="project-item" wx:for="{{extraProjects}}" wx:key="name" bindtap="onProjectTap" data-name="{{item.name}}">
+        <view class="project-info">
+          <text class="project-name">{{item.name}}</text>
+          <text class="project-count">{{item.count}}笔</text>
+        </view>
+        <text class="project-amount amount-expense">¥{{item.amount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{recentBills.length > 0}}">
+    <view class="section-title">最近账单</view>
+    <view class="bill-list">
+      <bill-item wx:for="{{recentBills}}" wx:key="_id" bill="{{item}}" bindtap="onBillTap" data-id="{{item._id}}"></bill-item>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && totalExpense === 0}}">
+    <text class="empty-text">暂无账单，点击下方记账开始吧</text>
+  </view>
+</view>

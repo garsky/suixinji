@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "编辑账单",
+  "usingComponents": {
+    "category-picker": "/components/category-picker/category-picker"
+  }
+}

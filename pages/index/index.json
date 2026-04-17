@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "随心记",
+  "usingComponents": {
+    "bill-item": "/components/bill-item/bill-item"
+  }
+}

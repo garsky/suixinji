@@ -1,0 +1,159 @@
+.bill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.project-badge {
+  background: #fff3e0;
+  padding: 8rpx 20rpx;
+  border-radius: 8rpx;
+}
+
+.project-badge-text {
+  font-size: 26rpx;
+  color: #f57c00;
+  font-weight: 500;
+}
+
+.remove-from-project {
+  padding: 8rpx 20rpx;
+}
+
+.remove-text {
+  font-size: 24rpx;
+  color: #e74c3c;
+}
+
+.form-group {
+  margin-bottom: 24rpx;
+}
+
+.form-label {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+  display: block;
+}
+
+.form-input {
+  border: 1rpx solid #e0e0e0;
+  border-radius: 10rpx;
+  padding: 16rpx 20rpx;
+  font-size: 28rpx;
+}
+
+.form-picker {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 10rpx;
+  padding: 16rpx 20rpx;
+  font-size: 28rpx;
+}
+
+.placeholder {
+  color: #ccc;
+}
+
+.picker-arrow {
+  color: #ccc;
+  font-size: 32rpx;
+}
+
+.form-date {
+  font-size: 28rpx;
+  color: #333;
+  padding: 16rpx 0;
+}
+
+.level-tabs {
+  display: flex;
+  gap: 16rpx;
+}
+
+.level-tab {
+  padding: 12rpx 32rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  background: #f0f0f0;
+  color: #666;
+}
+
+.level-tab.active {
+  background: #4A90D9;
+  color: #fff;
+}
+
+.mt-20 {
+  margin-top: 20rpx;
+}
+
+.popup-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.popup {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  padding: 30rpx;
+  padding-bottom: calc(30rpx + env(safe-area-inset-bottom));
+}
+
+.popup.show {
+  transform: translateY(0);
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.popup-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.popup-close {
+  font-size: 32rpx;
+  color: #999;
+  padding: 10rpx;
+}
+
+.picker-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.picker-item {
+  padding: 16rpx 32rpx;
+  border-radius: 10rpx;
+  background: #f0f0f0;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.picker-item.active {
+  background: #4A90D9;
+  color: #fff;
+}
