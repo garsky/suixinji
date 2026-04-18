@@ -37,20 +37,25 @@ Page({
   },
 
   loadBill(id) {
-    const bills = JSON.parse(wx.getStorageSync('bills') || '[]')
-    const bill = bills.find(b => b._id === id)
-    if (bill) {
-      if (typeof bill.date === 'string') {
-        bill.dateStr = bill.date
+    const db = wx.cloud.database()
+    db.collection('bills').doc(id).get().then(res => {
+      const bill = res.data
+      if (bill) {
+        if (typeof bill.date === 'string') {
+          bill.dateStr = bill.date
+        } else {
+          const d = new Date(bill.date)
+          bill.dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+        }
+        this.setData({ bill })
       } else {
-        const d = new Date(bill.date)
-        bill.dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+        wx.showToast({ title: '账单不存在', icon: 'none' })
+        setTimeout(() => wx.navigateBack(), 1500)
       }
-      this.setData({ bill })
-    } else {
+    }).catch(() => {
       wx.showToast({ title: '账单不存在', icon: 'none' })
       setTimeout(() => wx.navigateBack(), 1500)
-    }
+    })
   },
 
   onFieldInput(e) {

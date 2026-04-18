@@ -54,16 +54,18 @@ Page({
   },
 
   loadBill(id) {
-    const bills = JSON.parse(wx.getStorageSync('bills') || '[]')
-    const bill = bills.find(b => b._id === id)
-    if (bill) {
-      this.setData({
-        mode: 'manual',
-        manualBill: bill,
-        showSingleEdit: true,
-        editingBill: bill
-      })
-    }
+    const cloudDb = wx.cloud.database()
+    cloudDb.collection('bills').doc(id).get().then(res => {
+      const bill = res.data
+      if (bill) {
+        this.setData({
+          mode: 'manual',
+          manualBill: bill,
+          showSingleEdit: true,
+          editingBill: bill
+        })
+      }
+    })
   },
 
   loadStrategyTemplates() {

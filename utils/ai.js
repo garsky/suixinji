@@ -13,197 +13,53 @@ const parseBillImage = async (filePath, provider, apiKey, model, baseUrl) => {
 
 仅返回JSON数组，不要其他内容。`
 
-  let apiUrl = ''
-  let requestBody = {}
-
-  switch (provider) {
-    case 'openai':
-      apiUrl = `${baseUrl || 'https://api.openai.com'}/v1/chat/completions`
-      requestBody = {
-        model: model || 'gpt-4o',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: prompt },
-              { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${fileData}` } }
-            ]
-          }
-        ],
-        max_tokens: 4096
+  try {
+    const res = await wx.cloud.callFunction({
+      name: 'aiProxy',
+      data: {
+        action: 'parse',
+        provider,
+        apiKey,
+        model,
+        baseUrl,
+        fileData,
+        prompt
       }
-      break
-    case 'claude':
-      apiUrl = `${baseUrl || 'https://api.anthropic.com'}/v1/messages`
-      requestBody = {
-        model: model || 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: fileData } },
-              { type: 'text', text: prompt }
-            ]
-          }
-        ]
-      }
-      break
-    case 'qwen':
-      apiUrl = `${baseUrl || 'https://dashscope.aliyuncs.com/compatible-mode'}/v1/chat/completions`
-      requestBody = {
-        model: model || 'qwen-vl-max',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${fileData}` } },
-              { type: 'text', text: prompt }
-            ]
-          }
-        ]
-      }
-      break
-    case 'deepseek':
-      apiUrl = `${baseUrl || 'https://api.deepseek.com'}/v1/chat/completions`
-      requestBody = {
-        model: model || 'deepseek-chat',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: prompt },
-              { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${fileData}` } }
-            ]
-          }
-        ],
-        max_tokens: 4096
-      }
-      break
-    default:
-      apiUrl = `${baseUrl || 'https://api.openai.com'}/v1/chat/completions`
-      requestBody = {
-        model: model || 'gpt-4o',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: prompt },
-              { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${fileData}` } }
-            ]
-          }
-        ],
-        max_tokens: 4096
-      }
-  }
-
-  return new Promise((resolve, reject) => {
-    wx.request({
-      url: apiUrl,
-      method: 'POST',
-      header: buildHeaders(provider, apiKey),
-      data: requestBody,
-      success: res => {
-        if (res.statusCode === 200) {
-          const content = extractContent(provider, res.data)
-          try {
-            const jsonStr = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-            const bills = JSON.parse(jsonStr)
-            resolve(bills)
-          } catch (e) {
-            reject(new Error('AI返回内容解析失败: ' + content))
-          }
-        } else {
-          const errMsg = typeof res.data === 'string' ? res.data : (res.data && res.data.error ? JSON.stringify(res.data.error) : `HTTP ${res.statusCode}`)
-          reject(new Error(`API请求失败: ${errMsg}`))
-        }
-      },
-      fail: err => reject(new Error(err.errMsg || '网络请求失败'))
     })
-  })
-}
 
-const buildHeaders = (provider, apiKey) => {
-  switch (provider) {
-    case 'claude':
-      return {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      }
-    default:
-      return {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      }
+    if (res.result.code === 0) {
+      return res.result.data
+    } else {
+      throw new Error(res.result.message || 'AI解析失败')
+    }
+  } catch (err) {
+    const msg = (err && err.message) || (err && err.errMsg) || String(err) || '未知错误'
+    throw new Error(msg)
   }
 }
 
-const extractContent = (provider, data) => {
-  switch (provider) {
-    case 'claude':
-      return data.content[0].text
-    default:
-      return data.choices[0].message.content
-  }
-}
-
-const testConnection = (provider, apiKey, model, baseUrl) => {
-  let apiUrl = ''
-  let requestBody = {}
-
-  switch (provider) {
-    case 'claude':
-      apiUrl = `${baseUrl || 'https://api.anthropic.com'}/v1/messages`
-      requestBody = {
-        model: model || 'claude-sonnet-4-20250514',
-        max_tokens: 10,
-        messages: [{ role: 'user', content: 'hi' }]
+const testConnection = async (provider, apiKey, model, baseUrl) => {
+  try {
+    const res = await wx.cloud.callFunction({
+      name: 'aiProxy',
+      data: {
+        action: 'test',
+        provider,
+        apiKey,
+        model,
+        baseUrl
       }
-      break
-    case 'qwen':
-      apiUrl = `${baseUrl || 'https://dashscope.aliyuncs.com/compatible-mode'}/v1/chat/completions`
-      requestBody = {
-        model: model || 'qwen-vl-max',
-        max_tokens: 10,
-        messages: [{ role: 'user', content: 'hi' }]
-      }
-      break
-    case 'deepseek':
-      apiUrl = `${baseUrl || 'https://api.deepseek.com'}/v1/chat/completions`
-      requestBody = {
-        model: model || 'deepseek-chat',
-        max_tokens: 10,
-        messages: [{ role: 'user', content: 'hi' }]
-      }
-      break
-    default:
-      apiUrl = `${baseUrl || 'https://api.openai.com'}/v1/chat/completions`
-      requestBody = {
-        model: model || 'gpt-4o',
-        max_tokens: 10,
-        messages: [{ role: 'user', content: 'hi' }]
-      }
-  }
-
-  return new Promise((resolve, reject) => {
-    wx.request({
-      url: apiUrl,
-      method: 'POST',
-      header: buildHeaders(provider, apiKey),
-      data: requestBody,
-      success: res => {
-        if (res.statusCode === 200) {
-          resolve('连接成功')
-        } else {
-          const errMsg = typeof res.data === 'string' ? res.data : (res.data && res.data.error ? JSON.stringify(res.data.error) : `HTTP ${res.statusCode}`)
-          reject(new Error(`连接失败: ${errMsg}`))
-        }
-      },
-      fail: err => reject(new Error(err.errMsg || '网络请求失败'))
     })
-  })
+
+    if (res.result.code === 0) {
+      return '连接成功'
+    } else {
+      throw new Error(res.result.message || '连接失败')
+    }
+  } catch (err) {
+    const msg = (err && err.message) || (err && err.errMsg) || String(err) || '未知错误'
+    throw new Error(msg)
+  }
 }
 
 module.exports = {
