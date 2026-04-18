@@ -114,10 +114,11 @@ const parseBillImage = async (filePath, provider, apiKey, model, baseUrl) => {
             reject(new Error('AI返回内容解析失败: ' + content))
           }
         } else {
-          reject(new Error(`API请求失败: ${res.statusCode} ${JSON.stringify(res.data)}`))
+          const errMsg = typeof res.data === 'string' ? res.data : (res.data && res.data.error ? JSON.stringify(res.data.error) : `HTTP ${res.statusCode}`)
+          reject(new Error(`API请求失败: ${errMsg}`))
         }
       },
-      fail: err => reject(err)
+      fail: err => reject(new Error(err.errMsg || '网络请求失败'))
     })
   })
 }
@@ -161,6 +162,22 @@ const testConnection = (provider, apiKey, model, baseUrl) => {
         messages: [{ role: 'user', content: 'hi' }]
       }
       break
+    case 'qwen':
+      apiUrl = `${baseUrl || 'https://dashscope.aliyuncs.com/compatible-mode'}/v1/chat/completions`
+      requestBody = {
+        model: model || 'qwen-vl-max',
+        max_tokens: 10,
+        messages: [{ role: 'user', content: 'hi' }]
+      }
+      break
+    case 'deepseek':
+      apiUrl = `${baseUrl || 'https://api.deepseek.com'}/v1/chat/completions`
+      requestBody = {
+        model: model || 'deepseek-chat',
+        max_tokens: 10,
+        messages: [{ role: 'user', content: 'hi' }]
+      }
+      break
     default:
       apiUrl = `${baseUrl || 'https://api.openai.com'}/v1/chat/completions`
       requestBody = {
@@ -180,10 +197,11 @@ const testConnection = (provider, apiKey, model, baseUrl) => {
         if (res.statusCode === 200) {
           resolve('连接成功')
         } else {
-          reject(new Error(`连接失败: ${res.statusCode}`))
+          const errMsg = typeof res.data === 'string' ? res.data : (res.data && res.data.error ? JSON.stringify(res.data.error) : `HTTP ${res.statusCode}`)
+          reject(new Error(`连接失败: ${errMsg}`))
         }
       },
-      fail: err => reject(err)
+      fail: err => reject(new Error(err.errMsg || '网络请求失败'))
     })
   })
 }

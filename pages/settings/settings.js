@@ -104,7 +104,8 @@ Page({
         this.setData({ testing: false, testResult: '✅ 连接成功' })
       })
       .catch(err => {
-        this.setData({ testing: false, testResult: '❌ ' + err.message })
+        const msg = (err && err.message) || (err && err.errMsg) || String(err) || '未知错误'
+        this.setData({ testing: false, testResult: '❌ ' + msg })
       })
   },
 
