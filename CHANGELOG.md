@@ -1,5 +1,26 @@
 # 随心记 更新日志
 
+## v0.6.1 (2026-04-18)
+
+### 修复
+
+- 关闭 `project.config.json` 中 `urlCheck` 域名校验，修复开发环境 AI 连接测试报错 `request:fail url not in domain list`
+- 正式发布时需在微信公众平台后台配置合法域名后重新开启
+
+## v0.6.0 (2026-04-18)
+
+### 修复
+
+- 修复 AI 连接测试点击后报错 `undefined` 的问题
+  - 根因：`wx.request` 的 `fail` 回调返回的 err 对象使用 `errMsg` 属性而非 `message`，直接 `reject(err)` 后 settings.js 中 `err.message` 为 `undefined`
+  - 修复：`fail` 回调中统一用 `new Error(err.errMsg || '网络请求失败')` 包装
+  - 修复：`success` 非 200 时提取 API 返回的具体错误信息（`res.data.error`），而非仅显示状态码
+  - 修复：settings.js 错误显示增加兜底逻辑，防止 `err.message` 为空时显示 `undefined`
+
+### 新增
+
+- `testConnection` 补全 qwen 和 deepseek 的测试支持（之前只有 claude 和 default/openai）
+
 ## v0.5.1 (2026-04-17)
 
 ### 回退
